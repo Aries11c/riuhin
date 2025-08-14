@@ -1,77 +1,113 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riuhin - Sign Up</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom right, #00b4db, #0083b0);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 90%;
-            max-width: 350px;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar - Riuhin</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+    input {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+    button {
+        width: 100%;
+        padding: 10px;
+        background: #1e90ff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #187bcd;
+    }
+    p {
+        text-align: center;
+        margin-top: 10px;
+    }
+    a {
+        color: #1e90ff;
+        text-decoration: none;
+    }
+    @media (max-width: 480px) {
+        .container {
+            padding: 15px;
         }
         h2 {
-            margin-bottom: 20px;
+            font-size: 20px;
         }
-        input {
-            width: 100%;
-            max-width: 300px;
-            padding: 10px;
-            margin: 8px auto;
-            display: block;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        button {
-            background: #0083b0;
-            color: white;
-            border: none;
-            padding: 10px;
-            width: 100%;
-            max-width: 300px;
-            margin-top: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #005f73;
-        }
-        p {
-            margin-top: 15px;
-        }
-        a {
-            color: #0083b0;
-            text-decoration: none;
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
-
-<div class="card">
-    <h2>Sign Up</h2>
-    <form action="login.html" method="get">
-        <input type="text" placeholder="Username (max 15 huruf)" maxlength="15" required>
-        <input type="email" placeholder="Email" required>
-        <input type="password" placeholder="Password (min 6 huruf)" minlength="6" required>
-        <input type="password" placeholder="Konfirmasi Password" minlength="6" required>
-        <button type="submit">Daftar</button>
-    </form>
-    <p>Sudah punya akun? <a href="login.html">Login</a></p>
+<div class="container">
+    <h2>Daftar Riuhin</h2>
+    <input type="text" id="username" placeholder="Username (max 15 huruf)" maxlength="15" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Sandi (min 6 huruf)" minlength="6" required>
+    <input type="password" id="confirmPassword" placeholder="Konfirmasi Sandi" minlength="6" required>
+    <button onclick="signup()">Daftar</button>
+    <p>Sudah punya akun? <a href="login.html">Masuk</a></p>
 </div>
 
+<script>
+function signup() {
+    let username = document.getElementById("username").value.trim();
+    let email = document.getElementById("email").value.trim();
+    let password = document.getElementById("password").value;
+    let confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (username.length === 0 || email.length === 0 || password.length === 0 || confirmPassword.length === 0) {
+        alert("Semua kolom wajib diisi!");
+        return;
+    }
+    if (username.length > 15) {
+        alert("Username maksimal 15 huruf!");
+        return;
+    }
+    if (password.length < 6) {
+        alert("Sandi minimal 6 huruf!");
+        return;
+    }
+    if (password !== confirmPassword) {
+        alert("Konfirmasi sandi tidak cocok!");
+        return;
+    }
+
+    // Simpan akun ke localStorage
+    localStorage.setItem("userEmail", email);
+    localStorage.setItem("userPassword", password);
+    alert("Pendaftaran berhasil! Silakan login.");
+    window.location.href = "login.html";
+}
+</script>
 </body>
 </html>

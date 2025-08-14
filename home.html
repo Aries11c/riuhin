@@ -1,38 +1,80 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riuhin - Home</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            margin: 0;
-            padding: 20px;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beranda - Riuhin</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+        color: #1e90ff;
+        margin-bottom: 10px;
+    }
+    p {
+        color: #555;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+    button {
+        padding: 10px 20px;
+        background: #ff4d4d;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #cc0000;
+    }
+    @media (max-width: 480px) {
+        .container {
+            padding: 15px;
         }
         h1 {
-            color: #0083b0;
+            font-size: 24px;
         }
-        a {
-            display: inline-block;
-            margin-top: 20px;
-            background: #0083b0;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-        }
-        a:hover {
-            background: #005f73;
-        }
-    </style>
+    }
+</style>
 </head>
+<script>
+// Cek apakah user sudah login
+if (localStorage.getItem("isLoggedIn") !== "true") {
+    alert("Silakan login terlebih dahulu!");
+    window.location.href = "login.html";
+}
+</script>
 <body>
+<div class="container">
+    <h1>Selamat Datang di Riuhin!</h1>
+    <p>Kamu berhasil login. Selamat menikmati website ini 🎉</p>
+    <button onclick="logout()">Logout</button>
+</div>
 
-<h1>Selamat Datang di Riuhin 🎉</h1>
-<p>Ini halaman home sementara untuk uji coba login & signup.</p>
-<a href="login.html">Keluar</a>
-
+<script>
+function logout() {
+    // Hapus session (kalau mau bisa clear data login)
+    alert("Kamu telah logout.");
+    window.location.href = "login.html";
+}
+</script>
 </body>
 </html>

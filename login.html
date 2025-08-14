@@ -1,75 +1,103 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riuhin - Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom right, #00b4db, #0083b0);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 90%;
-            max-width: 350px;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Masuk - Riuhin</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+    input {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+    button {
+        width: 100%;
+        padding: 10px;
+        background: #1e90ff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #187bcd;
+    }
+    p {
+        text-align: center;
+        margin-top: 10px;
+    }
+    a {
+        color: #1e90ff;
+        text-decoration: none;
+    }
+    @media (max-width: 480px) {
+        .container {
+            padding: 15px;
         }
         h2 {
-            margin-bottom: 20px;
+            font-size: 20px;
         }
-        input {
-            width: 100%;
-            max-width: 300px;
-            padding: 10px;
-            margin: 8px auto;
-            display: block;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        button {
-            background: #0083b0;
-            color: white;
-            border: none;
-            padding: 10px;
-            width: 100%;
-            max-width: 300px;
-            margin-top: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #005f73;
-        }
-        p {
-            margin-top: 15px;
-        }
-        a {
-            color: #0083b0;
-            text-decoration: none;
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
-
-<div class="card">
-    <h2>Login</h2>
-    <form action="home.html" method="get">
-        <input type="email" placeholder="Email" required>
-        <input type="password" placeholder="Password" required>
-        <button type="submit">Masuk</button>
-    </form>
+<div class="container">
+    <h2>Masuk Riuhin</h2>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Sandi" required>
+    <button onclick="login()">Masuk</button>
     <p>Belum punya akun? <a href="signup.html">Daftar</a></p>
 </div>
 
+<script>
+function login() {
+    let email = document.getElementById("email").value.trim();
+    let password = document.getElementById("password").value;
+
+    let storedEmail = localStorage.getItem("userEmail");
+    let storedPassword = localStorage.getItem("userPassword");
+
+    if (!storedEmail || !storedPassword) {
+        alert("Akun belum terdaftar! Silakan daftar dulu.");
+        return;
+    }
+
+    if (email === storedEmail && password === storedPassword) {
+        alert("Login berhasil!");
+        // Simpan status login
+        localStorage.setItem("isLoggedIn", "true");
+        window.location.href = "home.html";
+    } else {
+        alert("Email atau sandi salah!");
+    }
+}
+</script>
 </body>
 </html>

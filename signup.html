@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riuhin - Sign Up</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #00b4db, #0083b0);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            margin: 8px auto;
+            display: block;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background: #0083b0;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #005f73;
+        }
+        p {
+            margin-top: 15px;
+        }
+        a {
+            color: #0083b0;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Sign Up</h2>
+    <form action="login.html" method="get">
+        <input type="text" placeholder="Username (max 15 huruf)" maxlength="15" required>
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Password (min 6 huruf)" minlength="6" required>
+        <input type="password" placeholder="Konfirmasi Password" minlength="6" required>
+        <button type="submit">Daftar</button>
+    </form>
+    <p>Sudah punya akun? <a href="login.html">Login</a></p>
+</div>
+
+</body>
+</html>

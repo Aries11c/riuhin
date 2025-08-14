@@ -1,168 +1,224 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profil - RIUHIN</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f5f5f5;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 15px;
-      background: #222;
-      color: white;
-    }
-    .profile-info {
-      text-align: center;
-      padding: 20px;
-      background: white;
-      margin-bottom: 10px;
-    }
-    .profile-info h2 {
-      margin: 0;
-    }
-    .follow-btn {
-      background: #007bff;
-      border: none;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .follow-btn.followed {
-      background: gray;
-    }
-    .post {
-      background: white;
-      margin: 10px;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-    .post-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .username {
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .delete-btn {
-      background: none;
-      border: none;
-      color: red;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    @media (max-width: 600px) {
-      header h1 { font-size: 20px; }
-      .profile-info h2 { font-size: 18px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - RIUHIN</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #333;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+        header a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .container {
+            padding: 15px;
+            max-width: 600px;
+            margin: auto;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            resize: none;
+        }
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+        .post {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .post-header {
+            font-weight: bold;
+            color: #007bff;
+            cursor: pointer;
+        }
+        .post-actions {
+            margin-top: 8px;
+        }
+        .like-btn, .follow-btn, .delete-btn {
+            background: #eee;
+            margin-right: 5px;
+        }
+        .like-btn.liked {
+            background: #ffcccc;
+        }
+        .follow-btn.following {
+            background: #cce5ff;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Profil</h1>
-    <a href="home.html" style="color:white;text-decoration:none;">Beranda</a>
-  </header>
 
-  <div class="profile-info">
-    <h2 id="profile-username"></h2>
-    <p id="followers-count">Followers: 0</p>
-    <button id="profile-follow-btn" class="follow-btn">Follow</button>
-  </div>
+<header>
+    <h1>RIUHIN</h1>
+    <a href="profile.html">Profil</a>
+</header>
 
-  <div id="posts-container"></div>
+<div class="container">
+    <h3>Buat Postingan</h3>
+    <textarea id="postContent" rows="3" placeholder="Apa yang sedang terjadi?"></textarea>
+    <button onclick="createPost()">Post</button>
 
-  <script>
-    if (!localStorage.getItem("username")) {
+    <div id="postsContainer"></div>
+</div>
+
+<script>
+// Cek login
+let currentUser = localStorage.getItem("username");
+if (!currentUser) {
     window.location.href = "login.html";
 }
-    const currentUser = localStorage.getItem("username");
-    const profileUser = currentUser; // untuk sekarang profil sendiri
-    const postsContainer = document.getElementById("posts-container");
-    const profileUsername = document.getElementById("profile-username");
-    const followersCount = document.getElementById("followers-count");
-    const profileFollowBtn = document.getElementById("profile-follow-btn");
 
-    profileUsername.textContent = profileUser;
+// Load posts dari localStorage
+let posts = JSON.parse(localStorage.getItem("posts")) || [];
 
-    let followersData = JSON.parse(localStorage.getItem("followersData")) || {};
-    let posts = JSON.parse(localStorage.getItem("posts")) || [];
+function savePosts() {
+    localStorage.setItem("posts", JSON.stringify(posts));
+}
 
-    function updateFollowersCount() {
-      const count = followersData[profileUser]?.length || 0;
-      followersCount.textContent = `Followers: ${count}`;
-    }
+// Render semua post
+function renderPosts() {
+    let container = document.getElementById("postsContainer");
+    container.innerHTML = "";
 
-    function isFollowing(viewer, target) {
-      return followersData[target]?.includes(viewer);
-    }
+    posts.slice().reverse().forEach((post, index) => {
+        let postDiv = document.createElement("div");
+        postDiv.classList.add("post");
 
-    function toggleFollow(viewer, target) {
-      if (!followersData[target]) followersData[target] = [];
-      if (isFollowing(viewer, target)) {
-        followersData[target] = followersData[target].filter(u => u !== viewer);
-      } else {
-        followersData[target].push(viewer);
-      }
-      localStorage.setItem("followersData", JSON.stringify(followersData));
-      renderPosts();
-      updateFollowButton();
-      updateFollowersCount();
-    }
+        // Header username
+        let usernameEl = document.createElement("div");
+        usernameEl.classList.add("post-header");
+        usernameEl.textContent = post.username;
+        usernameEl.onclick = () => {
+            localStorage.setItem("viewProfile", post.username);
+            window.location.href = "profile.html";
+        };
 
-    function updateFollowButton() {
-      if (isFollowing(currentUser, profileUser)) {
-        profileFollowBtn.textContent = "Followed";
-        profileFollowBtn.classList.add("followed");
-      } else {
-        profileFollowBtn.textContent = "Follow";
-        profileFollowBtn.classList.remove("followed");
-      }
-    }
+        // Konten posting
+        let contentEl = document.createElement("div");
+        contentEl.textContent = post.content;
 
-    function deletePost(index) {
-      posts.splice(index, 1);
-      localStorage.setItem("posts", JSON.stringify(posts));
-      renderPosts();
-    }
+        // Tombol aksi
+        let actionsEl = document.createElement("div");
+        actionsEl.classList.add("post-actions");
 
-    function renderPosts() {
-      postsContainer.innerHTML = "";
-      posts.forEach((post, index) => {
-        if (post.username === profileUser) {
-          const postEl = document.createElement("div");
-          postEl.className = "post";
-          postEl.innerHTML = `
-            <div class="post-header">
-              <span class="username">${post.username}</span>
-              ${post.username === currentUser ? `<button class="delete-btn" onclick="deletePost(${index})">🗑 Hapus</button>` : ""}
-            </div>
-            <p>${post.text}</p>
-            <button class="follow-btn ${isFollowing(currentUser, post.username) ? "followed" : ""}" onclick="toggleFollow('${currentUser}','${post.username}')">
-              ${isFollowing(currentUser, post.username) ? "Followed" : "Follow"}
-            </button>
-          `;
-          postsContainer.appendChild(postEl);
+        // Tombol Follow
+        let followBtn = document.createElement("button");
+        followBtn.classList.add("follow-btn");
+        if (post.followers && post.followers.includes(currentUser)) {
+            followBtn.textContent = "Followed";
+            followBtn.classList.add("following");
+        } else {
+            followBtn.textContent = "Follow";
         }
-      });
-    }
+        followBtn.onclick = () => toggleFollow(post);
 
-    profileFollowBtn.addEventListener("click", () => {
-      toggleFollow(currentUser, profileUser);
+        // Tombol Like
+        let likeBtn = document.createElement("button");
+        likeBtn.classList.add("like-btn");
+        if (post.likes && post.likes.includes(currentUser)) {
+            likeBtn.textContent = `Like (${post.likes.length})`;
+            likeBtn.classList.add("liked");
+        } else {
+            likeBtn.textContent = `Like (${post.likes ? post.likes.length : 0})`;
+        }
+        likeBtn.onclick = () => toggleLike(post);
+
+        // Tombol Delete (hanya untuk pembuat post)
+        if (post.username === currentUser) {
+            let deleteBtn = document.createElement("button");
+            deleteBtn.classList.add("delete-btn");
+            deleteBtn.textContent = "Delete";
+            deleteBtn.onclick = () => deletePost(index);
+            actionsEl.appendChild(deleteBtn);
+        }
+
+        actionsEl.appendChild(followBtn);
+        actionsEl.appendChild(likeBtn);
+
+        postDiv.appendChild(usernameEl);
+        postDiv.appendChild(contentEl);
+        postDiv.appendChild(actionsEl);
+        container.appendChild(postDiv);
     });
+}
 
-    updateFollowButton();
-    updateFollowersCount();
+function createPost() {
+    let content = document.getElementById("postContent").value.trim();
+    if (!content) return alert("Post tidak boleh kosong!");
+
+    posts.push({
+        username: currentUser,
+        content: content,
+        likes: [],
+        followers: []
+    });
+    savePosts();
+    document.getElementById("postContent").value = "";
     renderPosts();
-  </script>
+}
+
+function toggleFollow(post) {
+    if (!post.followers) post.followers = [];
+    let idx = post.followers.indexOf(currentUser);
+    if (idx > -1) {
+        post.followers.splice(idx, 1);
+    } else {
+        post.followers.push(currentUser);
+    }
+    savePosts();
+    renderPosts();
+}
+
+function toggleLike(post) {
+    if (!post.likes) post.likes = [];
+    let idx = post.likes.indexOf(currentUser);
+    if (idx > -1) {
+        post.likes.splice(idx, 1);
+    } else {
+        post.likes.push(currentUser);
+    }
+    savePosts();
+    renderPosts();
+}
+
+function deletePost(index) {
+    if (confirm("Hapus posting ini?")) {
+        posts.splice(posts.length - 1 - index, 1);
+        savePosts();
+        renderPosts();
+    }
+}
+
+renderPosts();
+</script>
+
 </body>
 </html>

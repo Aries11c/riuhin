@@ -1,103 +1,83 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Masuk - Riuhin</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f2f2f2;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    .container {
-        background: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        max-width: 400px;
-        width: 100%;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-        text-align: center;
-        margin-bottom: 20px;
-        color: #333;
-    }
-    input {
-        width: 100%;
-        padding: 10px;
-        margin: 8px 0;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        font-size: 14px;
-    }
-    button {
-        width: 100%;
-        padding: 10px;
-        background: #1e90ff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        cursor: pointer;
-    }
-    button:hover {
-        background: #187bcd;
-    }
-    p {
-        text-align: center;
-        margin-top: 10px;
-    }
-    a {
-        color: #1e90ff;
-        text-decoration: none;
-    }
-    @media (max-width: 480px) {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - RIUHIN</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
         .container {
-            padding: 15px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 350px;
         }
-        h2 {
-            font-size: 20px;
+        h2 { text-align: center; }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
-    }
-</style>
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover { background: #218838; }
+    </style>
 </head>
 <body>
 <div class="container">
-    <h2>Masuk Riuhin</h2>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Sandi" required>
-    <button onclick="login()">Masuk</button>
-    <p>Belum punya akun? <a href="signup.html">Daftar</a></p>
+    <h2>Login ke RIUHIN</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+
+    <!-- Tambahan link ke signup -->
+    <p style="text-align:center;margin-top:10px;">
+        Belum punya akun? <a href="signup.html">Daftar di sini</a>
+    </p>
 </div>
+<
 
 <script>
 function login() {
     let email = document.getElementById("email").value.trim();
     let password = document.getElementById("password").value;
 
-    let storedEmail = localStorage.getItem("userEmail");
-    let storedPassword = localStorage.getItem("userPassword");
-
-    if (!storedEmail || !storedPassword) {
-        alert("Akun belum terdaftar! Silakan daftar dulu.");
+    if (!email || !password) {
+        alert("Email dan password wajib diisi!");
         return;
     }
 
-    if (email === storedEmail && password === storedPassword) {
-        alert("Login berhasil!");
-        // Simpan status login
-        localStorage.setItem("isLoggedIn", "true");
-        window.location.href = "home.html";
-    } else {
-        alert("Email atau sandi salah!");
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+    let user = users.find(u => u.email === email && u.password === password);
+
+    if (!user) {
+        alert("Email atau password salah!");
+        return;
     }
+
+    localStorage.setItem("username", user.username);
+    alert("Login berhasil!");
+    window.location.href = "home.html";
 }
 </script>
+
 </body>
 </html>

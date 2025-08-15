@@ -3,210 +3,92 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beranda - RIUHIN</title>
+<title>RIUHIN - Home</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background: #f4f4f4;
-    }
-    header {
-        background: #1da1f2;
-        color: white;
-        padding: 10px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    header h1 {
-        font-size: 20px;
-        margin: 0;
-    }
-    header a {
-        color: white;
-        text-decoration: none;
-        font-weight: bold;
-    }
-    .container {
-        padding: 15px;
-    }
-    .post-form {
-        background: white;
-        padding: 10px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
-    .post-form textarea {
-        width: 100%;
-        resize: none;
-        padding: 8px;
-        font-size: 14px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-    }
-    .post-form button {
-        background: #1da1f2;
-        color: white;
-        border: none;
-        padding: 8px 15px;
-        margin-top: 5px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    .post {
-        background: white;
-        padding: 10px;
-        border-radius: 8px;
-        margin-bottom: 15px;
-    }
-    .post-header {
-        font-weight: bold;
-        cursor: pointer;
-        color: #1da1f2;
-    }
-    .post-text {
-        margin: 5px 0;
-    }
-    .post-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 5px;
-    }
-    .like-btn, .follow-btn, .delete-btn {
-        background: none;
-        border: none;
-        color: #1da1f2;
-        cursor: pointer;
-        font-size: 14px;
-    }
+    body { font-family: Arial, sans-serif; margin:0; padding:0; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:10px 15px; background:#1da1f2; color:white; }
+    .post { border-bottom:1px solid #ddd; padding:10px; }
+    .username { font-weight:bold; color:#1da1f2; cursor:pointer; }
+    button { margin-right:5px; }
 </style>
 </head>
 <body>
 
 <header>
-    <h1>RIUHIN</h1>
-    <a href="profile.html">Profil</a>
+    <h2>RIUHIN</h2>
+    <a href="profile.html" style="color:white; text-decoration:none;">Profil</a>
 </header>
 
-<div class="container">
-    <div class="post-form">
-        <textarea id="postText" rows="3" placeholder="Apa yang sedang kamu pikirkan?"></textarea>
-        <button onclick="addPost()">Posting</button>
-    </div>
-
-    <div id="postsContainer"></div>
+<div id="postForm" style="padding:10px;">
+    <textarea id="postContent" placeholder="Apa yang sedang terjadi?" style="width:100%; height:60px;"></textarea>
+    <br>
+    <button onclick="buatPost()">Posting</button>
 </div>
 
+<div id="postsContainer"></div>
+
 <script>
-    // Cek login
     let currentUser = localStorage.getItem("currentUser");
     if (!currentUser) {
-        window.location.href = "login.html";
+        document.body.innerHTML = `
+            <div style="text-align:center; margin-top:50px; font-family:Arial;">
+                <h2>Anda belum login</h2>
+                <p>Silakan login terlebih dahulu untuk mengakses halaman ini.</p>
+                <a href="login.html" style="display:inline-block; background:#1da1f2; color:white; padding:10px 20px; border-radius:5px; text-decoration:none;">Login</a>
+            </div>
+        `;
+        throw new Error("Stop script karena belum login");
     }
 
-    let posts = JSON.parse(localStorage.getItem("posts")) || [];
-    let followers = JSON.parse(localStorage.getItem("followers")) || {};
-
-    function saveData() {
-        localStorage.setItem("posts", JSON.stringify(posts));
-        localStorage.setItem("followers", JSON.stringify(followers));
-    }
-
-    function addPost() {
-        let text = document.getElementById("postText").value.trim();
-        if (text === "") return;
-
+    function buatPost() {
+        let content = document.getElementById("postContent").value.trim();
+        if (content === "") return alert("Postingan tidak boleh kosong");
+        let posts = JSON.parse(localStorage.getItem("posts") || "[]");
         posts.unshift({
             username: currentUser,
-            text: text,
-            likes: 0
+            content: content,
+            likes: 0,
+            followers: 0
         });
-        saveData();
-        document.getElementById("postText").value = "";
-        renderPosts();
-    }
-
-    function toggleFollow(user) {
-        if (!followers[user]) followers[user] = [];
-
-        if (followers[user].includes(currentUser)) {
-            followers[user] = followers[user].filter(u => u !== currentUser);
-        } else {
-            followers[user].push(currentUser);
-        }
-        saveData();
-        renderPosts();
-    }
-
-    function likePost(index) {
-        posts[index].likes = (posts[index].likes || 0) + 1;
-        saveData();
-        renderPosts();
-    }
-
-    function deletePost(index) {
-        posts.splice(index, 1);
-        saveData();
+        localStorage.setItem("posts", JSON.stringify(posts));
+        document.getElementById("postContent").value = "";
         renderPosts();
     }
 
     function renderPosts() {
-        const postsContainer = document.getElementById("postsContainer");
-        postsContainer.innerHTML = "";
-
+        let posts = JSON.parse(localStorage.getItem("posts") || "[]");
+        let container = document.getElementById("postsContainer");
+        container.innerHTML = "";
         posts.forEach((post, index) => {
-            let postDiv = document.createElement("div");
-            postDiv.className = "post";
-
-            let postHeader = document.createElement("div");
-            postHeader.className = "post-header";
-            postHeader.textContent = post.username;
-            postHeader.onclick = () => {
-                if (post.username !== currentUser) {
-                    window.location.href = `profile.html?user=${post.username}`;
-                } else {
-                    window.location.href = "profile.html";
-                }
-            };
-
-            let postText = document.createElement("div");
-            postText.className = "post-text";
-            postText.textContent = post.text;
-
-            let postActions = document.createElement("div");
-            postActions.className = "post-actions";
-
-            // Follow button
-            if (post.username !== currentUser) {
-                let followBtn = document.createElement("button");
-                followBtn.className = "follow-btn";
-                followBtn.textContent = followers[post.username] && followers[post.username].includes(currentUser) ? "Followed" : "Follow";
-                followBtn.onclick = () => toggleFollow(post.username);
-                postActions.appendChild(followBtn);
-            }
-
-            // Like button
-            let likeBtn = document.createElement("button");
-            likeBtn.className = "like-btn";
-            likeBtn.textContent = `Like (${post.likes || 0})`;
-            likeBtn.onclick = () => likePost(index);
-            postActions.appendChild(likeBtn);
-
-            // Delete button (hanya pemilik post)
-            if (post.username === currentUser) {
-                let deleteBtn = document.createElement("button");
-                deleteBtn.className = "delete-btn";
-                deleteBtn.textContent = "Delete";
-                deleteBtn.onclick = () => deletePost(index);
-                postActions.appendChild(deleteBtn);
-            }
-
-            postDiv.appendChild(postHeader);
-            postDiv.appendChild(postText);
-            postDiv.appendChild(postActions);
-            postsContainer.appendChild(postDiv);
+            let div = document.createElement("div");
+            div.className = "post";
+            div.innerHTML = `
+                <span class="username" onclick="lihatProfil('${post.username}')">${post.username}</span>
+                <p>${post.content}</p>
+                <button onclick="likePost(${index})">Like (${post.likes})</button>
+                ${post.username === currentUser ? `<button onclick="hapusPost(${index})">Hapus</button>` : ""}
+            `;
+            container.appendChild(div);
         });
+    }
+
+    function likePost(index) {
+        let posts = JSON.parse(localStorage.getItem("posts") || "[]");
+        posts[index].likes++;
+        localStorage.setItem("posts", JSON.stringify(posts));
+        renderPosts();
+    }
+
+    function hapusPost(index) {
+        let posts = JSON.parse(localStorage.getItem("posts") || "[]");
+        posts.splice(index, 1);
+        localStorage.setItem("posts", JSON.stringify(posts));
+        renderPosts();
+    }
+
+    function lihatProfil(username) {
+        localStorage.setItem("viewProfile", username);
+        window.location.href = "profil.html";
     }
 
     renderPosts();

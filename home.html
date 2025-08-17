@@ -1,51 +1,191 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Home - Riuhin</title>
-<style>
+  <meta charset="UTF-8">
+  <title>Riuhin - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
     body {
-        font-family: Arial, sans-serif;
-        background: #e9ecef;
-        padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
     }
-    .navbar {
-        background: #007bff;
-        padding: 10px;
-        color: white;
-        display: flex;
-        justify-content: space-between;
+    header {
+      background: #1da1f2;
+      color: white;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
     }
-    button {
-        background: red;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        cursor: pointer;
-        border-radius: 5px;
+    main {
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
     }
-</style>
+    .post {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .post-header {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .username {
+      color: #1da1f2;
+      cursor: pointer;
+    }
+    .btn {
+      border: none;
+      background: #1da1f2;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    .btn:hover { background: #0d8ddb; }
+    .comment-section {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+      display: none;
+    }
+    textarea {
+      width: 100%;
+      height: 60px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      resize: none;
+      padding: 8px;
+    }
+    .comment {
+      background: #f1f1f1;
+      padding: 8px;
+      border-radius: 5px;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body>
-<div class="navbar">
-    <span id="welcome"></span>
-    <button onclick="logout()">Logout</button>
-</div>
-<h2>Selamat datang di Riuhin!</h2>
-<p>Ini halaman utama setelah login.</p>
+  <header>Riuhin - Home</header>
+  <main>
+    <h2>Postingan Terbaru</h2>
+    <div id="postsContainer"></div>
+  </main>
 
-<script>
-let user = JSON.parse(localStorage.getItem("loggedInUser"));
-if (!user) {
-    window.location.href = "login.html";
-}
-document.getElementById("welcome").innerText = "Halo, " + user.username;
+  <script>
+    // Cek login
+    const currentUser = localStorage.getItem("currentUser");
+    let loggedUser = null;
+    if (currentUser) {
+      loggedUser = JSON.parse(localStorage.getItem(currentUser));
+    }
 
-function logout() {
-    localStorage.removeItem("loggedInUser");
-    window.location.href = "login.html";
-}
-</script>
+    function getPosts() {
+      return JSON.parse(localStorage.getItem("posts")) || [];
+    }
+    function savePosts(posts) {
+      localStorage.setItem("posts", JSON.stringify(posts));
+    }
+
+    // Like post
+    function likePost(id) {
+      if (!loggedUser) {
+        alert("Anda harus login untuk like!");
+        return;
+      }
+      let posts = getPosts();
+      let post = posts.find(p => p.id === id);
+      if (!post) return;
+
+      if (post.email === loggedUser.email) {
+        alert("Tidak bisa like postingan sendiri!");
+        return;
+      }
+
+      post.likes = (post.likes || 0) + 1;
+      savePosts(posts);
+      tampilkanPostingan();
+    }
+
+    // Toggle komentar
+    function toggleComments(id) {
+      const section = document.getElementById("comments-" + id);
+      section.style.display = section.style.display === "block" ? "none" : "block";
+    }
+
+    // Tambah komentar
+    function addComment(id) {
+      if (!loggedUser) {
+        alert("Anda harus login untuk komentar!");
+        return;
+      }
+      let commentInput = document.getElementById("commentInput-" + id);
+      let text = commentInput.value.trim();
+      if (text.length === 0) return;
+
+      let posts = getPosts();
+      let post = posts.find(p => p.id === id);
+      if (!post.comments) post.comments = [];
+      post.comments.push({ user: loggedUser.username, text: text });
+      savePosts(posts);
+
+      commentInput.value = "";
+      tampilkanPostingan();
+      toggleComments(id); // buka komentar lagi
+    }
+
+    // Lihat profil orang lain
+    function goToProfile(username) {
+      if (loggedUser && loggedUser.username === username) {
+        window.location.href = "profil.html";
+      } else {
+        window.location.href = "user.html?u=" + encodeURIComponent(username);
+      }
+    }
+
+    // Render postingan
+    function tampilkanPostingan() {
+      const posts = getPosts().reverse();
+      const container = document.getElementById("postsContainer");
+      container.innerHTML = "";
+
+      if (posts.length === 0) {
+        container.innerHTML = "<p>Belum ada postingan.</p>";
+        return;
+      }
+
+      posts.forEach(post => {
+        const div = document.createElement("div");
+        div.className = "post";
+        div.innerHTML = `
+          <div class="post-header">
+            <span class="username" onclick="goToProfile('${post.username}')">${post.username}</span>
+          </div>
+          <p>${post.content}</p>
+          <small>${post.timestamp}</small>
+          <div style="margin-top:10px;">
+            <button class="btn" onclick="likePost(${post.id})">Like (${post.likes || 0})</button>
+            <button class="btn" onclick="toggleComments(${post.id})">Komentar</button>
+          </div>
+          <div id="comments-${post.id}" class="comment-section">
+            <h4>Komentar</h4>
+            ${(post.comments || []).map(c => `<div class="comment"><b>${c.user}:</b> ${c.text}</div>`).join("")}
+            <textarea id="commentInput-${post.id}" placeholder="Tulis komentar..."></textarea>
+            <button class="btn" onclick="addComment(${post.id})">Kirim</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    tampilkanPostingan();
+  </script>
 </body>
 </html>

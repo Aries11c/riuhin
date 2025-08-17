@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Riuhin - User Profil</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #1da1f2;
+      color: white;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+    main {
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    .profile {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .btn {
+      border: none;
+      background: #1da1f2;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .btn:hover { background: #0d8ddb; }
+    .post {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .post-header {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #1da1f2;
+    }
+  </style>
+</head>
+<body>
+  <header>Profil Pengguna</header>
+  <main>
+    <div class="profile">
+      <h2 id="usernameDisplay"></h2>
+      <p>Followers: <span id="followerCount">0</span></p>
+      <button id="followBtn" class="btn"></button>
+    </div>
+
+    <h3>Postingan</h3>
+    <div id="userPosts"></div>
+  </main>
+
+  <script>
+    // Cek login
+    const currentUser = localStorage.getItem("currentUser");
+    let loggedUser = null;
+    if (currentUser) {
+      loggedUser = JSON.parse(localStorage.getItem(currentUser));
+    }
+
+    // Ambil username dari URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get("u");
+
+    if (!username) {
+      document.body.innerHTML = "<h2 style='text-align:center'>User tidak ditemukan.</h2>";
+    }
+
+    // Ambil data user target
+    let targetUser = null;
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key.includes("@")) { // data user
+        const user = JSON.parse(localStorage.getItem(key));
+        if (user.username === username) {
+          targetUser = user;
+          break;
+        }
+      }
+    }
+
+    if (!targetUser) {
+      document.body.innerHTML = "<h2 style='text-align:center'>User tidak ditemukan.</h2>";
+    }
+
+    // Tampilkan profil user
+    document.getElementById("usernameDisplay").innerText = targetUser.username;
+    document.getElementById("followerCount").innerText = targetUser.followers ? targetUser.followers.length : 0;
+
+    const followBtn = document.getElementById("followBtn");
+
+    function updateFollowButton() {
+      if (!loggedUser) {
+        followBtn.innerText = "Login untuk Follow";
+        followBtn.disabled = true;
+        return;
+      }
+
+      if (loggedUser.username === targetUser.username) {
+        followBtn.innerText = "Ini akun Anda";
+        followBtn.disabled = true;
+        return;
+      }
+
+      if (!targetUser.followers) targetUser.followers = [];
+
+      if (targetUser.followers.includes(loggedUser.username)) {
+        followBtn.innerText = "Unfollow";
+      } else {
+        followBtn.innerText = "Follow";
+      }
+    }
+
+    followBtn.addEventListener("click", function() {
+      if (!loggedUser) return;
+
+      if (!targetUser.followers) targetUser.followers = [];
+
+      if (targetUser.followers.includes(loggedUser.username)) {
+        targetUser.followers = targetUser.followers.filter(f => f !== loggedUser.username);
+      } else {
+        targetUser.followers.push(loggedUser.username);
+      }
+
+      localStorage.setItem(targetUser.email, JSON.stringify(targetUser));
+      document.getElementById("followerCount").innerText = targetUser.followers.length;
+      updateFollowButton();
+    });
+
+    updateFollowButton();
+
+    // Tampilkan postingan user ini
+    function getPosts() {
+      return JSON.parse(localStorage.getItem("posts")) || [];
+    }
+
+    function tampilkanPostingan() {
+      const posts = getPosts().filter(p => p.username === targetUser.username).reverse();
+      const container = document.getElementById("userPosts");
+      container.innerHTML = "";
+
+      if (posts.length === 0) {
+        container.innerHTML = "<p>User ini belum membuat postingan.</p>";
+        return;
+      }
+
+      posts.forEach(post => {
+        const div = document.createElement("div");
+        div.className = "post";
+        div.innerHTML = `
+          <div class="post-header">${post.username}</div>
+          <p>${post.content}</p>
+          <small>${post.timestamp}</small>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    tampilkanPostingan();
+  </script>
+</body>
+</html>

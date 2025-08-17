@@ -1,79 +1,45 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Riuhin</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f0f2f5;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    .container {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        text-align: center;
-        width: 100%;
-        max-width: 350px;
-    }
-    input {
-        width: 90%;
-        max-width: 280px;
-        padding: 10px;
-        margin: 8px auto;
-        display: block;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-    button {
-        background: #28a745;
-        color: white;
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        width: 90%;
-        max-width: 280px;
-    }
-    button:hover {
-        background: #1e7e34;
-    }
-    p {
-        margin-top: 10px;
-    }
-</style>
+  <meta charset="UTF-8">
+  <title>Login - Riuhin</title>
+  <style>
+    body { font-family: Arial, sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; background:#f0f2f5; margin:0; }
+    .container { background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1); width:350px; }
+    h2 { text-align:center; margin-bottom:20px; }
+    input { width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px; }
+    button { width:100%; padding:10px; background:#28a745; border:none; border-radius:5px; color:#fff; font-weight:bold; cursor:pointer; }
+    button:hover { background:#1e7e34; }
+    p { text-align:center; }
+    a { color:#007bff; text-decoration:none; }
+  </style>
 </head>
 <body>
-<div class="container">
-    <h2>Login</h2>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Sandi" required>
+  <div class="container">
+    <h2>Login Riuhin</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Sandi">
     <button onclick="login()">Login</button>
     <p>Belum punya akun? <a href="signup.html">Daftar</a></p>
-</div>
+  </div>
 
-<script>
-function login() {
-    let email = document.getElementById("email").value.trim();
-    let password = document.getElementById("password").value;
+  <script>
+    function login() {
+      let email = document.getElementById("email").value.trim();
+      let password = document.getElementById("password").value;
 
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-    let user = users.find(u => u.email === email && u.password === password);
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+      let user = users.find(u => u.email === email && u.password === password);
 
-    if (!user) {
-        alert("Email atau sandi salah, atau akun belum terdaftar!");
+      if (!user) {
+        alert("Email atau sandi salah!");
         return;
-    }
+      }
 
-    localStorage.setItem("loggedInUser", JSON.stringify(user));
-    window.location.href = "home.html";
-}
-</script>
+      localStorage.setItem("currentUser", user.username);
+      alert("Login berhasil!");
+      window.location.href = "home.html"; // nanti kita buat
+    }
+  </script>
 </body>
 </html>

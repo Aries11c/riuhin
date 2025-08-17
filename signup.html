@@ -1,98 +1,74 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Signup - Riuhin</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f0f2f5;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    .container {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        text-align: center;
-        width: 100%;
-        max-width: 350px;
-    }
-    input {
-        width: 90%;
-        max-width: 280px;
-        padding: 10px;
-        margin: 8px auto;
-        display: block;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-    button {
-        background: #007bff;
-        color: white;
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        width: 90%;
-        max-width: 280px;
-    }
-    button:hover {
-        background: #0056b3;
-    }
-    p {
-        margin-top: 10px;
-    }
-</style>
+  <meta charset="UTF-8">
+  <title>Signup - Riuhin</title>
+  <style>
+    body { font-family: Arial, sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; background:#f0f2f5; margin:0; }
+    .container { background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1); width:350px; }
+    h2 { text-align:center; margin-bottom:20px; }
+    input { width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px; }
+    button { width:100%; padding:10px; background:#007bff; border:none; border-radius:5px; color:#fff; font-weight:bold; cursor:pointer; }
+    button:hover { background:#0056b3; }
+    p { text-align:center; }
+    a { color:#007bff; text-decoration:none; }
+  </style>
 </head>
 <body>
-<div class="container">
-    <h2>Daftar Akun</h2>
-    <input type="text" id="username" placeholder="Username (max 15 huruf)" maxlength="15" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Sandi (min 6 huruf)" minlength="6" required>
-    <input type="password" id="confirmPassword" placeholder="Konfirmasi Sandi" minlength="6" required>
+  <div class="container">
+    <h2>Daftar Riuhin</h2>
+    <input type="text" id="username" placeholder="Username (max 15)" maxlength="15">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Sandi (min 6)">
+    <input type="password" id="confirmPassword" placeholder="Konfirmasi Sandi">
     <button onclick="signup()">Daftar</button>
     <p>Sudah punya akun? <a href="login.html">Login</a></p>
-</div>
+  </div>
 
-<script>
-function signup() {
-    let username = document.getElementById("username").value.trim();
-    let email = document.getElementById("email").value.trim();
-    let password = document.getElementById("password").value;
-    let confirmPassword = document.getElementById("confirmPassword").value;
+  <script>
+    function signup() {
+      let username = document.getElementById("username").value.trim();
+      let email = document.getElementById("email").value.trim();
+      let password = document.getElementById("password").value;
+      let confirmPassword = document.getElementById("confirmPassword").value;
 
-    if (!username || !email || !password || !confirmPassword) {
+      if (!username || !email || !password || !confirmPassword) {
         alert("Harap isi semua kolom!");
         return;
-    }
-    if (password.length < 6) {
-        alert("Password minimal 6 huruf!");
+      }
+      if (password.length < 6) {
+        alert("Sandi minimal 6 huruf!");
         return;
-    }
-    if (password !== confirmPassword) {
-        alert("Konfirmasi sandi tidak cocok!");
+      }
+      if (password !== confirmPassword) {
+        alert("Konfirmasi sandi tidak sama!");
         return;
-    }
+      }
 
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-    let exist = users.find(user => user.email === email);
-    if (exist) {
-        alert("Email sudah terdaftar!");
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+
+      // Cek apakah username/email sudah terpakai
+      if (users.find(u => u.username === username)) {
+        alert("Username sudah dipakai!");
         return;
+      }
+      if (users.find(u => u.email === email)) {
+        alert("Email sudah dipakai!");
+        return;
+      }
+
+      users.push({
+        username: username,
+        email: email,
+        password: password,
+        followers: [],
+        following: []
+      });
+
+      localStorage.setItem("users", JSON.stringify(users));
+      alert("Pendaftaran berhasil! Silakan login.");
+      window.location.href = "login.html";
     }
-
-    users.push({ username, email, password });
-    localStorage.setItem("users", JSON.stringify(users));
-
-    alert("Pendaftaran berhasil! Silakan login.");
-    window.location.href = "login.html";
-}
-</script>
+  </script>
 </body>
 </html>

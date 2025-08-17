@@ -3,189 +3,193 @@
 <head>
   <meta charset="UTF-8">
   <title>Riuhin - Home</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f6f8;
       margin: 0;
       padding: 0;
+      background: #f5f5f5;
     }
-    header {
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       background: #1da1f2;
       color: white;
-      padding: 15px;
-      font-size: 20px;
-      font-weight: bold;
-      text-align: center;
+      padding: 10px 15px;
+      border-radius: 0 0 8px 8px;
     }
-    main {
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
+
+    .profile-icon {
+      font-size: 22px;
+      cursor: pointer;
+      transition: transform 0.2s;
     }
+
+    .profile-icon:hover {
+      transform: scale(1.2);
+    }
+
+    #postsContainer {
+      margin: 20px;
+    }
+
     .post {
       background: white;
-      padding: 15px;
+      padding: 10px;
+      margin-bottom: 15px;
       border-radius: 8px;
-      margin-top: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+
     .post-header {
-      font-weight: bold;
-      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
     }
-    .username {
+
+    .post-username {
+      font-weight: bold;
       color: #1da1f2;
       cursor: pointer;
     }
-    .btn {
-      border: none;
-      background: #1da1f2;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-right: 5px;
+
+    .post-username:hover {
+      text-decoration: underline;
     }
-    .btn:hover { background: #0d8ddb; }
+
+    .post-actions {
+      margin-top: 8px;
+    }
+
+    .btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin-right: 10px;
+      color: #1da1f2;
+    }
+
+    .btn:hover {
+      text-decoration: underline;
+    }
+
     .comment-section {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid #ddd;
+      margin-top: 8px;
+      padding-left: 10px;
+      border-left: 2px solid #ddd;
       display: none;
     }
-    textarea {
-      width: 100%;
-      height: 60px;
-      margin-top: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      resize: none;
-      padding: 8px;
-    }
+
     .comment {
-      background: #f1f1f1;
-      padding: 8px;
-      border-radius: 5px;
-      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+
+    .comment strong {
+      color: #333;
     }
   </style>
 </head>
 <body>
-  <header>Riuhin - Home</header>
-  <main>
-    <h2>Postingan Terbaru</h2>
-    <div id="postsContainer"></div>
-  </main>
+  <div class="header">
+    <h2>Riuhin</h2>
+    <div class="profile-icon" onclick="goProfil()">👤</div>
+  </div>
+
+  <div id="postsContainer"></div>
 
   <script>
-    // Cek login
-    const currentUser = localStorage.getItem("currentUser");
-    let loggedUser = null;
-    if (currentUser) {
-      loggedUser = JSON.parse(localStorage.getItem(currentUser));
+    let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    if (!currentUser) {
+      alert("Anda belum login!");
+      window.location.href = "login.html";
     }
 
-    function getPosts() {
-      return JSON.parse(localStorage.getItem("posts")) || [];
-    }
-    function savePosts(posts) {
-      localStorage.setItem("posts", JSON.stringify(posts));
-    }
+    let posts = JSON.parse(localStorage.getItem("posts")) || [];
 
-    // Like post
-    function likePost(id) {
-      if (!loggedUser) {
-        alert("Anda harus login untuk like!");
-        return;
-      }
-      let posts = getPosts();
-      let post = posts.find(p => p.id === id);
-      if (!post) return;
-
-      if (post.email === loggedUser.email) {
-        alert("Tidak bisa like postingan sendiri!");
-        return;
-      }
-
-      post.likes = (post.likes || 0) + 1;
-      savePosts(posts);
-      tampilkanPostingan();
+    function goProfil() {
+      window.location.href = "profil.html";
     }
 
-    // Toggle komentar
-    function toggleComments(id) {
-      const section = document.getElementById("comments-" + id);
-      section.style.display = section.style.display === "block" ? "none" : "block";
-    }
-
-    // Tambah komentar
-    function addComment(id) {
-      if (!loggedUser) {
-        alert("Anda harus login untuk komentar!");
-        return;
-      }
-      let commentInput = document.getElementById("commentInput-" + id);
-      let text = commentInput.value.trim();
-      if (text.length === 0) return;
-
-      let posts = getPosts();
-      let post = posts.find(p => p.id === id);
-      if (!post.comments) post.comments = [];
-      post.comments.push({ user: loggedUser.username, text: text });
-      savePosts(posts);
-
-      commentInput.value = "";
-      tampilkanPostingan();
-      toggleComments(id); // buka komentar lagi
-    }
-
-    // Lihat profil orang lain
-    function goToProfile(username) {
-      if (loggedUser && loggedUser.username === username) {
-        window.location.href = "profil.html";
-      } else {
-        window.location.href = "user.html?u=" + encodeURIComponent(username);
-      }
-    }
-
-    // Render postingan
-    function tampilkanPostingan() {
-      const posts = getPosts().reverse();
-      const container = document.getElementById("postsContainer");
+    function renderPosts() {
+      let container = document.getElementById("postsContainer");
       container.innerHTML = "";
 
-      if (posts.length === 0) {
-        container.innerHTML = "<p>Belum ada postingan.</p>";
-        return;
-      }
-
-      posts.forEach(post => {
-        const div = document.createElement("div");
+      posts.forEach((post, index) => {
+        let div = document.createElement("div");
         div.className = "post";
+
         div.innerHTML = `
           <div class="post-header">
-            <span class="username" onclick="goToProfile('${post.username}')">${post.username}</span>
+            <span class="post-username" onclick="goUser('${post.username}')">${post.username}</span>
+            ${post.username === currentUser.username ? `<button class="btn" onclick="deletePost(${index})">Hapus</button>` : ""}
           </div>
-          <p>${post.content}</p>
-          <small>${post.timestamp}</small>
-          <div style="margin-top:10px;">
-            <button class="btn" onclick="likePost(${post.id})">Like (${post.likes || 0})</button>
-            <button class="btn" onclick="toggleComments(${post.id})">Komentar</button>
+          <div class="post-content">${post.content}</div>
+          <div class="post-actions">
+            <button class="btn" onclick="likePost(${index})">❤️ ${post.likes || 0}</button>
+            <button class="btn" onclick="toggleComments(${index})">💬 ${post.comments ? post.comments.length : 0}</button>
           </div>
-          <div id="comments-${post.id}" class="comment-section">
-            <h4>Komentar</h4>
-            ${(post.comments || []).map(c => `<div class="comment"><b>${c.user}:</b> ${c.text}</div>`).join("")}
-            <textarea id="commentInput-${post.id}" placeholder="Tulis komentar..."></textarea>
-            <button class="btn" onclick="addComment(${post.id})">Kirim</button>
+          <div class="comment-section" id="comments-${index}">
+            <div>
+              <input type="text" id="commentInput-${index}" placeholder="Tulis komentar..." />
+              <button onclick="addComment(${index})">Kirim</button>
+            </div>
+            <div id="commentList-${index}">
+              ${(post.comments || []).map(c => `<div class="comment"><strong>${c.user}:</strong> ${c.text}</div>`).join("")}
+            </div>
           </div>
         `;
+
         container.appendChild(div);
       });
     }
 
-    tampilkanPostingan();
+    function goUser(username) {
+      if (username === currentUser.username) {
+        window.location.href = "profil.html";
+      } else {
+        localStorage.setItem("viewUser", username);
+        window.location.href = "user.html";
+      }
+    }
+
+    function likePost(index) {
+      if (!posts[index].likes) posts[index].likes = 0;
+      posts[index].likes++;
+      localStorage.setItem("posts", JSON.stringify(posts));
+      renderPosts();
+    }
+
+    function toggleComments(index) {
+      let section = document.getElementById("comments-" + index);
+      section.style.display = section.style.display === "block" ? "none" : "block";
+    }
+
+    function addComment(index) {
+      let input = document.getElementById("commentInput-" + index);
+      let text = input.value.trim();
+      if (!text) return;
+
+      if (!posts[index].comments) posts[index].comments = [];
+      posts[index].comments.push({ user: currentUser.username, text });
+
+      localStorage.setItem("posts", JSON.stringify(posts));
+      input.value = "";
+      renderPosts();
+      toggleComments(index);
+      toggleComments(index);
+    }
+
+    function deletePost(index) {
+      if (posts[index].username !== currentUser.username) return;
+      posts.splice(index, 1);
+      localStorage.setItem("posts", JSON.stringify(posts));
+      renderPosts();
+    }
+
+    renderPosts();
   </script>
 </body>
 </html>

@@ -2,175 +2,108 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Riuhin - Profil Saya</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil Saya - Riuhin</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #1da1f2;
-      color: white;
-      padding: 15px;
-      font-size: 20px;
-      font-weight: bold;
-      text-align: center;
-    }
-    main {
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
-    }
-    .btn {
-      display: inline-block;
-      margin: 5px;
-      text-decoration: none;
-      padding: 8px 15px;
-      background: #1da1f2;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-      border: none;
-    }
-    .btn:hover {
-      background: #0d8ddb;
-    }
-    textarea {
-      width: 100%;
-      height: 80px;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      resize: none;
-    }
-    .post {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .post-header {
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    .delete-btn {
-      background: red;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      float: right;
-    }
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; background: #f5f8fa; padding: 20px; }
+    h2 { color: #1da1f2; }
+    .profile-header { display: flex; justify-content: space-between; align-items: center; }
+    .btn { padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+    .btnLogout { background: red; color: white; }
+    .btnEdit { background: orange; color: white; }
+    .postForm textarea { width: 100%; padding: 10px; margin: 10px 0; }
+    .postForm button { background: #1da1f2; color: white; }
+    .post { background: white; padding: 10px; margin: 10px 0; border-radius: 8px; }
+    .btnDelete { background: crimson; color: white; margin-top: 5px; }
   </style>
 </head>
 <body>
-  <header>Riuhin - Profil Saya</header>
-  <main>
-    <h2 id="usernameDisplay">Username</h2>
-    <p id="followersCount">Followers: 0</p>
+  <div class="profile-header">
+    <h2 id="usernameDisplay"></h2>
+    <div>
+      <button class="btn btnEdit" onclick="editProfil()">Edit Profil</button>
+      <button class="btn btnLogout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+  <p><span id="followersCount">0</span> followers</p>
 
-    <button class="btn" onclick="editProfil()">Edit Profil</button>
-    <button class="btn" onclick="logout()">Logout</button>
+  <div class="postForm">
+    <h3>Buat Postingan</h3>
+    <textarea id="postContent" placeholder="Apa yang kamu pikirkan?" required></textarea>
+    <button class="btn" onclick="buatPosting()">Posting</button>
+  </div>
 
-    <h3 style="margin-top:30px;">Buat Postingan</h3>
-    <textarea id="postInput" placeholder="Apa yang sedang kamu pikirkan?"></textarea>
-    <button class="btn" onclick="buatPost()">Posting</button>
-
-    <h3 style="margin-top:30px;">Postingan Saya</h3>
-    <div id="myPosts"></div>
-  </main>
+  <h3>Postingan Saya</h3>
+  <div id="myPosts"></div>
 
   <script>
-    // Cek login
-    const currentUser = localStorage.getItem("currentUser");
+    let currentUser = JSON.parse(localStorage.getItem("currentUser"));
     if (!currentUser) {
       alert("Anda belum login!");
       window.location.href = "login.html";
     }
 
-    const user = JSON.parse(localStorage.getItem(currentUser));
-    if (user) {
-      document.getElementById("usernameDisplay").innerText = user.username;
-      document.getElementById("followersCount").innerText = "Followers: " + (user.followers || 0);
-    }
-
-    // Ambil semua postingan dari localStorage
-    function getPosts() {
-      return JSON.parse(localStorage.getItem("posts")) || [];
-    }
-
-    // Simpan postingan
-    function savePosts(posts) {
-      localStorage.setItem("posts", JSON.stringify(posts));
-    }
-
-    // Buat postingan baru
-    function buatPost() {
-      const content = document.getElementById("postInput").value.trim();
-      if (content.length === 0) {
-        alert("Postingan tidak boleh kosong!");
-        return;
-      }
-
-      const posts = getPosts();
-      const newPost = {
-        id: Date.now(),
-        username: user.username,
-        email: user.email,
-        content: content,
-        likes: 0,
-        comments: [],
-        timestamp: new Date().toLocaleString()
-      };
-      posts.push(newPost);
-      savePosts(posts);
-
-      document.getElementById("postInput").value = "";
+    function loadProfile() {
+      document.getElementById("usernameDisplay").innerText = currentUser.username;
+      document.getElementById("followersCount").innerText = currentUser.followers ? currentUser.followers.length : 0;
       tampilkanPostingan();
     }
 
-    // Tampilkan semua postingan user sendiri
+    function buatPosting() {
+      const content = document.getElementById("postContent").value.trim();
+      if (!content) return alert("Tuliskan sesuatu dulu!");
+
+      let posts = JSON.parse(localStorage.getItem("posts")) || [];
+      posts.push({
+        email: currentUser.email,
+        username: currentUser.username,
+        content: content,
+        timestamp: new Date().toLocaleString()
+      });
+      localStorage.setItem("posts", JSON.stringify(posts));
+      document.getElementById("postContent").value = "";
+      tampilkanPostingan();
+    }
+
     function tampilkanPostingan() {
-      const posts = getPosts();
-      const myPosts = posts.filter(p => p.email === user.email);
+      const posts = JSON.parse(localStorage.getItem("posts")) || [];
+      const myPosts = posts.filter(p => p.email === currentUser.email).reverse();
+
       const container = document.getElementById("myPosts");
       container.innerHTML = "";
-
-      if (myPosts.length === 0) {
-        container.innerHTML = "<p>Belum ada postingan.</p>";
-        return;
-      }
-
-      myPosts.reverse().forEach(post => {
+      myPosts.forEach((post, index) => {
         const div = document.createElement("div");
         div.className = "post";
         div.innerHTML = `
-          <div class="post-header">
-            ${post.username}
-            <button class="delete-btn" onclick="hapusPost(${post.id})">Hapus</button>
-          </div>
           <p>${post.content}</p>
-          <small>${post.timestamp}</small>
+          <small>${post.timestamp}</small><br>
+          <button class="btnDelete" onclick="hapusPosting(${index})">Hapus</button>
         `;
         container.appendChild(div);
       });
     }
 
-    // Hapus postingan
-    function hapusPost(id) {
-      let posts = getPosts();
-      posts = posts.filter(p => p.id !== id);
-      savePosts(posts);
+    function hapusPosting(index) {
+      let posts = JSON.parse(localStorage.getItem("posts")) || [];
+      let myPosts = posts.filter(p => p.email === currentUser.email);
+      let postToDelete = myPosts[index];
+
+      posts = posts.filter(p => !(p.email === postToDelete.email && p.timestamp === postToDelete.timestamp));
+      localStorage.setItem("posts", JSON.stringify(posts));
       tampilkanPostingan();
     }
 
     function editProfil() {
-      alert("Fitur edit profil belum dibuat 🙂");
+      const newUsername = prompt("Masukkan username baru (max 15 huruf):", currentUser.username);
+      if (newUsername && newUsername.length <= 15) {
+        currentUser.username = newUsername;
+      }
+      const newPassword = prompt("Masukkan password baru (min 6 huruf):", currentUser.password);
+      if (newPassword && newPassword.length >= 6) {
+        currentUser.password = newPassword;
+      }
+      localStorage.setItem(currentUser.email, JSON.stringify(currentUser));
+      localStorage.setItem("currentUser", JSON.stringify(currentUser));
+      loadProfile();
     }
 
     function logout() {
@@ -178,8 +111,8 @@
       window.location.href = "login.html";
     }
 
-    // Load pertama kali
-    tampilkanPostingan();
+    loadProfile();
   </script>
 </body>
+</html>
 </html>

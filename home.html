@@ -3,96 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RIUHIN - Home</title>
+<title>Home - Riuhin</title>
 <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; }
-    header { display:flex; justify-content:space-between; align-items:center; padding:10px 15px; background:#1da1f2; color:white; }
-    .post { border-bottom:1px solid #ddd; padding:10px; }
-    .username { font-weight:bold; color:#1da1f2; cursor:pointer; }
-    button { margin-right:5px; }
+    body {
+        font-family: Arial, sans-serif;
+        background: #e9ecef;
+        padding: 20px;
+    }
+    .navbar {
+        background: #007bff;
+        padding: 10px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+    }
+    button {
+        background: red;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
 </style>
 </head>
 <body>
-
-<header>
-    <h2>RIUHIN</h2>
-    <a href="profile.html" style="color:white; text-decoration:none;">Profil</a>
-</header>
-
-<div id="postForm" style="padding:10px;">
-    <textarea id="postContent" placeholder="Apa yang sedang terjadi?" style="width:100%; height:60px;"></textarea>
-    <br>
-    <button onclick="buatPost()">Posting</button>
+<div class="navbar">
+    <span id="welcome"></span>
+    <button onclick="logout()">Logout</button>
 </div>
-
-<div id="postsContainer"></div>
+<h2>Selamat datang di Riuhin!</h2>
+<p>Ini halaman utama setelah login.</p>
 
 <script>
-    let currentUser = localStorage.getItem("currentUser");
-    if (!currentUser) {
-        document.body.innerHTML = `
-            <div style="text-align:center; margin-top:50px; font-family:Arial;">
-                <h2>Anda belum login</h2>
-                <p>Silakan login terlebih dahulu untuk mengakses halaman ini.</p>
-                <a href="login.html" style="display:inline-block; background:#1da1f2; color:white; padding:10px 20px; border-radius:5px; text-decoration:none;">Login</a>
-            </div>
-        `;
-        throw new Error("Stop script karena belum login");
-    }
+let user = JSON.parse(localStorage.getItem("loggedInUser"));
+if (!user) {
+    window.location.href = "login.html";
+}
+document.getElementById("welcome").innerText = "Halo, " + user.username;
 
-    function buatPost() {
-        let content = document.getElementById("postContent").value.trim();
-        if (content === "") return alert("Postingan tidak boleh kosong");
-        let posts = JSON.parse(localStorage.getItem("posts") || "[]");
-        posts.unshift({
-            username: currentUser,
-            content: content,
-            likes: 0,
-            followers: 0
-        });
-        localStorage.setItem("posts", JSON.stringify(posts));
-        document.getElementById("postContent").value = "";
-        renderPosts();
-    }
-
-    function renderPosts() {
-        let posts = JSON.parse(localStorage.getItem("posts") || "[]");
-        let container = document.getElementById("postsContainer");
-        container.innerHTML = "";
-        posts.forEach((post, index) => {
-            let div = document.createElement("div");
-            div.className = "post";
-            div.innerHTML = `
-                <span class="username" onclick="lihatProfil('${post.username}')">${post.username}</span>
-                <p>${post.content}</p>
-                <button onclick="likePost(${index})">Like (${post.likes})</button>
-                ${post.username === currentUser ? `<button onclick="hapusPost(${index})">Hapus</button>` : ""}
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    function likePost(index) {
-        let posts = JSON.parse(localStorage.getItem("posts") || "[]");
-        posts[index].likes++;
-        localStorage.setItem("posts", JSON.stringify(posts));
-        renderPosts();
-    }
-
-    function hapusPost(index) {
-        let posts = JSON.parse(localStorage.getItem("posts") || "[]");
-        posts.splice(index, 1);
-        localStorage.setItem("posts", JSON.stringify(posts));
-        renderPosts();
-    }
-
-    function lihatProfil(username) {
-        localStorage.setItem("viewProfile", username);
-        window.location.href = "profil.html";
-    }
-
-    renderPosts();
+function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html";
+}
 </script>
-
 </body>
 </html>

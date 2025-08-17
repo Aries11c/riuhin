@@ -1,61 +1,64 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup - RIUHIN</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 350px;
-        }
-        h2 { text-align: center; }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover { background: #0056b3; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signup - Riuhin</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f0f2f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .container {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        text-align: center;
+        width: 100%;
+        max-width: 350px;
+    }
+    input {
+        width: 90%;
+        max-width: 280px;
+        padding: 10px;
+        margin: 8px auto;
+        display: block;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    button {
+        background: #007bff;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 90%;
+        max-width: 280px;
+    }
+    button:hover {
+        background: #0056b3;
+    }
+    p {
+        margin-top: 10px;
+    }
+</style>
 </head>
 <body>
 <div class="container">
-    <h2>Daftar Akun RIUHIN</h2>
-    <input type="text" id="username" placeholder="Username (max 15 huruf)" maxlength="15">
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password (min 6 huruf)">
-    <input type="password" id="confirmPassword" placeholder="Konfirmasi Password">
+    <h2>Daftar Akun</h2>
+    <input type="text" id="username" placeholder="Username (max 15 huruf)" maxlength="15" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Sandi (min 6 huruf)" minlength="6" required>
+    <input type="password" id="confirmPassword" placeholder="Konfirmasi Sandi" minlength="6" required>
     <button onclick="signup()">Daftar</button>
-
-    <!-- Tambahan link ke login -->
-    <p style="text-align:center;margin-top:10px;">
-        Sudah punya akun? <a href="login.html">Login di sini</a>
-    </p>
+    <p>Sudah punya akun? <a href="login.html">Login</a></p>
 </div>
-
 
 <script>
 function signup() {
@@ -65,11 +68,7 @@ function signup() {
     let confirmPassword = document.getElementById("confirmPassword").value;
 
     if (!username || !email || !password || !confirmPassword) {
-        alert("Semua kolom harus diisi!");
-        return;
-    }
-    if (username.length > 15) {
-        alert("Username maksimal 15 huruf!");
+        alert("Harap isi semua kolom!");
         return;
     }
     if (password.length < 6) {
@@ -77,12 +76,13 @@ function signup() {
         return;
     }
     if (password !== confirmPassword) {
-        alert("Konfirmasi password tidak sama!");
+        alert("Konfirmasi sandi tidak cocok!");
         return;
     }
 
     let users = JSON.parse(localStorage.getItem("users")) || [];
-    if (users.some(u => u.email === email)) {
+    let exist = users.find(user => user.email === email);
+    if (exist) {
         alert("Email sudah terdaftar!");
         return;
     }
@@ -94,6 +94,5 @@ function signup() {
     window.location.href = "login.html";
 }
 </script>
-
 </body>
 </html>
